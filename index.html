@@ -17,6 +17,9 @@
 				margin: auto;
 				width: 600px;
 				height: 300px;
+
+				color: oklch(.73 .73 173);
+				background-color: oklch(.27 .73 188);
 			}
 			.cimkeTarolo{
 				display: flex;
@@ -49,9 +52,9 @@
 		</style>
 		<div class="widget">
 			<div class="cimkeTarolo">
-				<h1 id="lightLabel">L73%</h1>
+				<h1 id="lightLabel">L0.73%</h1>
 				<h1 id="chromaLabel">C0.73</h1>
-				<h1 id="hueLabel">H173</h1>
+				<h1 id="hueLabel">H173°</h1>
 			</div>
 			<div class="colorBox" onclick="logLecho()" onscroll="captureScroll(event)" onmousemove="captureMouse(event)">
 				<div class="shouldbeAnSVG_Circle"></div>
@@ -63,7 +66,16 @@
 				chrom:0.73,
 				hue:172,
 			};
+
 			var mouseIsDown = false;
+			
+			var flagMonochrome = false;
+			var flagHead = true;
+			var flagFlap = true;
+			var flagHuePad = false;
+
+			var colorBox = document.querySelector('.colorBox');
+			var rootWidget = document.querySelector('.widget');
 
 			document.addEventListener('mousepress', function(event) {
 				console.log(lecho);
@@ -71,6 +83,7 @@
 
 			function logLecho(){
 				console.log(lecho);
+				console.log("%coklch(%s,%s,%i)","background: red; color: yellow; font-size: x-large",lecho.light,lecho.chrom,lecho.hue);
 			};
 
 			document.addEventListener('mousedown', function(event) {
@@ -85,12 +98,11 @@
 				}
 			});
 
-			var colorBox = document.querySelector('.colorBox');
 
 			function updateColorBox() {
 				colorBox.style.backgroundColor = `oklch(${lecho.light} ${lecho.chrom} ${lecho.hue})`;
-				document.querySelector('.widget').style.backgroundColor = `oklch(${(1-lecho.light)} ${lecho.chrom} ${(360-lecho.hue)})`;
-				document.querySelector('.widget').style.color = `oklch(${lecho.light} ${lecho.chrom} ${lecho.hue})`;
+				rootWidget.style.backgroundColor = `oklch(${(1-lecho.light)} ${lecho.chrom} ${(360-lecho.hue)})`;
+				rootWidget.style.color = `oklch(${lecho.light} ${lecho.chrom} ${lecho.hue})`;
 				
 
 				document.querySelector('#lightLabel').textContent = `L${lecho.light.toFixed(2)}%`;
@@ -112,9 +124,9 @@
 				// var scrollDistance = event.deltaY;
 				// event.deltaY > 1 ? lecho.hue++ : lecho.hue--;
 				if (event.deltaY < 1) {
-					lecho.hue = lecho.hue<360?lecho.hue+2:0;
+					lecho.hue = lecho.hue<360?lecho.hue+1:0;
 				} else {
-					lecho.hue = lecho.hue>0?lecho.hue-2:360;
+					lecho.hue = lecho.hue>0?lecho.hue-1:360;
 				}	
 				updateColorBox();
 				event.preventDefault();
@@ -141,7 +153,7 @@
 
 				if (!mouseIsDown) {
 					lecho.light = Math.round((relativeX / box.width) * 100)/100;
-					lecho.chrom = 1.00 - (relativeY / box.height);					
+					lecho.chrom = 1.00 - (Math.round((relativeY / box.height) * 100)/100);					
 				} else {
 					// dont change values if mouse is pressed
 					// might reverse
@@ -162,6 +174,21 @@
 
 				// console.log(`GlobalLCH: L:${lecho.light} | C:${lecho.light} | H:${lecho.light}`);
 			}
+
+			function toggleMonochrome(){
+				var bayer = rootWidget.style.filter;
+				flagMonochrome = !flagMonochrome;
+				rootWidget.style.filter=`grayscale(${+ flagMonochrome})`;
+				// bayer
+				// reasoning behind this (against a utility monochrome class pl.) is to keep the html widget cleaner I guess. And I usually think of classes as more static, architectural stuff.
+			}
+			function toggleMonochromeHalf(){
+				colorBox.style.filter = "grayscale(1)";
+			}
+
+			function toggleHead(){}
+			function toggleFlap(){}
+			function toggleHuePad(){}
 		</script>
 	</main>
 
