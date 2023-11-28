@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Lazy OKLCH</title>
+</head>
+<body>
+	<main>
+		<style type="text/css">
+			body{
+				border: 0;
+				font-family: monospace;
+				user-select: none;
+			}
+			.widget{
+				margin: auto;
+				width: 600px;
+				height: 300px;
+			}
+			.cimkeTarolo{
+				display: flex;
+				flex-direction: row;
+				width: 100%;
+				justify-content: space-between;
+				height: 50px;
+			}
+			.cimkeTarolo h1 {
+				margin: 0;
+				font-size: 47px;
+				letter-spacing: .2em;
+				letter-spacing: 0;
+			}
+			.colorBox{
+/*				background-color: hsl(173, 73%, 73%);*/
+				background-color: oklch(.73 .73 173);
+				width: 100%;
+				height: 250px;
+				cursor: pointer;
+			}
+			.colorBox::after {
+				content: "";
+				float: right;
+				width: 23%;
+				height: 250px;
+				background-color: #333c;
+				pointer-events: none; /* Allow events to pass through the overlay */
+			}
+		</style>
+		<div class="widget">
+			<div class="cimkeTarolo">
+				<h1 id="lightLabel">L73%</h1>
+				<h1 id="chromaLabel">C0.73</h1>
+				<h1 id="hueLabel">H173</h1>
+			</div>
+			<div class="colorBox" onclick="logLecho()" onscroll="captureScroll(event)" onmousemove="captureMouse(event)">
+				<div class="shouldbeAnSVG_Circle"></div>
+			</div>
+		</div>
+		<script type="text/javascript">
+			var lecho = {
+				light: 0.73,
+				chrom:0.73,
+				hue:172,
+			};
+			var mouseIsDown = false;
+
+			document.addEventListener('mousepress', function(event) {
+				console.log(lecho);
+			});
+
+			function logLecho(){
+				console.log(lecho);
+			};
+
+			document.addEventListener('mousedown', function(event) {
+				if (event.button === 0) { // Check if left mouse button is pressed (button value is 0)
+					mouseIsDown = true;
+				}
+			});
+
+			document.addEventListener('mouseup', function(event) {
+				if (event.button === 0) { // Check if left mouse button is released (button value is 0)
+					mouseIsDown = false;
+				}
+			});
+
+			var colorBox = document.querySelector('.colorBox');
+
+			function updateColorBox() {
+				colorBox.style.backgroundColor = `oklch(${lecho.light} ${lecho.chrom} ${lecho.hue})`;
+				document.querySelector('.widget').style.backgroundColor = `oklch(${(1-lecho.light)} ${lecho.chrom} ${(360-lecho.hue)})`;
+				document.querySelector('.widget').style.color = `oklch(${lecho.light} ${lecho.chrom} ${lecho.hue})`;
+				
+
+				document.querySelector('#lightLabel').textContent = `L${lecho.light.toFixed(2)}%`;
+				document.querySelector('#chromaLabel').textContent = `C${lecho.chrom.toFixed(2)}`;
+				document.querySelector('#hueLabel').textContent = `H${lecho.hue}°`;
+				// background-color: oklch(60% 0.4 240);
+			}
+
+			// function captureScroll(event){
+			// 	// Get the distance scrolled vertically
+			// 	var distanceScrolled = colorBox.scrollTop;
+
+			// 	// Log or use the distanceScrolled as needed
+			// 	console.log('Distance scrolled vertically:', distanceScrolled);
+			// };
+
+			colorBox.addEventListener('wheel', function(event) {
+				// The event.deltaY property represents the scroll distance
+				// var scrollDistance = event.deltaY;
+				// event.deltaY > 1 ? lecho.hue++ : lecho.hue--;
+				if (event.deltaY < 1) {
+					lecho.hue = lecho.hue<360?lecho.hue+2:0;
+				} else {
+					lecho.hue = lecho.hue<360?lecho.hue-2:360;
+				}	
+				updateColorBox();
+				event.preventDefault();
+			});
+
+			function captureMouse(event){
+				// Global mouse coordinates
+				const globalX = event.pageX;
+				const globalY = event.pageY;
+
+				updateColorBox();
+
+				// Coordinates relative to the div
+				const div = document.querySelector('.colorBox');
+				const divRect = div.getBoundingClientRect();
+				const relativeX = event.clientX - divRect.left;
+				const relativeY = event.clientY - divRect.top;
+
+				// Assuming you have the box and mouse objects defined elsewhere in your code
+				const box = {
+					width: div.offsetWidth,
+					height: div.offsetHeight,
+				};
+
+				if (!mouseIsDown) {
+					lecho.light = Math.round((relativeX / box.width) * 100)/100;
+					lecho.chrom = 1.00 - (relativeY / box.height);					
+				} else {
+					// dont change values if mouse is pressed
+					// might reverse
+					// lecho.hue = Math.round((relativeX / box.width) * 360);
+				}
+
+				// Ensure lecho.light stays within the range [0, 100]
+				// lecho.light = Math.max(0, Math.min(100, parseFloat(lecho.light)));
+
+				// Ensure lecho.chrom stays within the range [0, 1]
+				// lecho.chrom = Math.max(0, Math.min(1, lecho.chrom));
+
+				// console.clear();
+				// console.log(`Box width=${box.width}, height=${box.height}`);
+				// console.log(`Global Coordinates: X=${globalX}, Y=${globalY}`);
+				// console.log(`Relative to div: X=${relativeX.toFixed(2)}, Y=${relativeY.toFixed(2)}`);
+				// console.log(`GlobalLCH: L:${lecho.light} | C:${lecho.chrom.toFixed(2)} | H:${lecho.hue}`);
+
+				// console.log(`GlobalLCH: L:${lecho.light} | C:${lecho.light} | H:${lecho.light}`);
+			}
+		</script>
+	</main>
+
+</body>
+</html>
