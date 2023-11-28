@@ -1,6 +1,6 @@
 # lazyOKLCH
 
-![layzOKLCH widget](lazyOKCLH.png)
+![layzOKLCH widget](lazyOKLCH.png)
 
 This is a really lazy implementation of an OKLCH color picker.
 A mouse hoovering over the component controls the lightness and chroma
