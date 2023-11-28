@@ -114,7 +114,7 @@
 				if (event.deltaY < 1) {
 					lecho.hue = lecho.hue<360?lecho.hue+2:0;
 				} else {
-					lecho.hue = lecho.hue<360?lecho.hue-2:360;
+					lecho.hue = lecho.hue>0?lecho.hue-2:360;
 				}	
 				updateColorBox();
 				event.preventDefault();
