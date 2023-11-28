@@ -8,3 +8,5 @@ console in json, but hopefully I will change it later to copy to clipboard
 as hex or something.
 
 And scrolling over the component changes the hue (warping around).
+
+Right-click toggles monochrome.

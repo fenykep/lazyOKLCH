@@ -27,6 +27,8 @@
 				width: 100%;
 				justify-content: space-between;
 				height: 50px;
+				position: relative;
+				top: 0px;
 			}
 			.cimkeTarolo h1 {
 				margin: 0;
@@ -41,7 +43,7 @@
 				height: 250px;
 				cursor: pointer;
 			}
-			.colorBox::after {
+			.flapped::after {
 				content: "";
 				float: right;
 				width: 23%;
@@ -49,17 +51,32 @@
 				background-color: #333c;
 				pointer-events: none; /* Allow events to pass through the overlay */
 			}
+
+			footer ul {
+				position: absolute;
+				left: 100px;
+				top: 100px;
+				list-style: square;
+			}
 		</style>
-		<div class="widget">
+		<!-- Ill want to find a sane amount of functions that could live here -->
+		<div class="widget" onclick="logLecho()" onscroll="captureScroll(event)" onmousemove="captureMouse(event)">
 			<div class="cimkeTarolo">
-				<h1 id="lightLabel">L0.73%</h1>
+				<h1 id="lightLabel">L 73%</h1>
 				<h1 id="chromaLabel">C0.73</h1>
 				<h1 id="hueLabel">H173°</h1>
 			</div>
-			<div class="colorBox" onclick="logLecho()" onscroll="captureScroll(event)" onmousemove="captureMouse(event)">
+			<div class="colorBox flapped">
 				<div class="shouldbeAnSVG_Circle"></div>
 			</div>
 		</div>
+		<footer>
+			<ul>
+				<li>lClick: focus mode</li>
+				<li>sPace : export</li>
+				<li>rClick: monoo mode</li>
+			</ul>
+		</footer>
 		<script type="text/javascript">
 			var lecho = {
 				light: 0.73,
@@ -73,6 +90,7 @@
 			var flagHead = true;
 			var flagFlap = true;
 			var flagHuePad = false;
+			var flagHelp = true;
 
 			var colorBox = document.querySelector('.colorBox');
 			var rootWidget = document.querySelector('.widget');
@@ -81,9 +99,41 @@
 				console.log(lecho);
 			});
 
+			rootWidget.addEventListener("contextmenu", (e) => {handleRightClick(e)});
+			function handleRightClick(e){
+				e.preventDefault();
+				toggleMonochrome();
+				renderWidget();
+			}
+
+			//now I have 3-4 different implementation of eventhandling, Ill clean up later
+			document.body.onkeyup = function(e) {
+				if (e.key == " " ||
+					e.code == "Space" ||      
+					e.keyCode == 32      
+				) {
+					console.log("%coklch(%s %s %i)","background: red; color: yellow; font-size: x-large",lecho.light,lecho.chrom,lecho.hue);
+					navigator.clipboard.writeText(`oklch(${lecho.light} ${lecho.chrom.toFixed(2)} ${lecho.hue})`);
+				}
+			}
+
+			rootWidget.addEventListener("load", helpOff());
+
+			function helpOff(){
+				setTimeout(function() {
+					document.querySelector('footer').style.display='none';
+				}, 4000)
+			}
+
+			function toggleHelp(){
+				flagHelp = !flagHelp;
+				document.querySelector('footer').style.display=flagHelp?'block':'none';
+			}
+
 			function logLecho(){
-				console.log(lecho);
-				console.log("%coklch(%s,%s,%i)","background: red; color: yellow; font-size: x-large",lecho.light,lecho.chrom,lecho.hue);
+				toggleHead();
+				toggleFlap();
+				renderWidget();
 			};
 
 			document.addEventListener('mousedown', function(event) {
@@ -98,28 +148,7 @@
 				}
 			});
 
-
-			function updateColorBox() {
-				colorBox.style.backgroundColor = `oklch(${lecho.light} ${lecho.chrom} ${lecho.hue})`;
-				rootWidget.style.backgroundColor = `oklch(${(1-lecho.light)} ${lecho.chrom} ${(360-lecho.hue)})`;
-				rootWidget.style.color = `oklch(${lecho.light} ${lecho.chrom} ${lecho.hue})`;
-				
-
-				document.querySelector('#lightLabel').textContent = `L${lecho.light.toFixed(2)}%`;
-				document.querySelector('#chromaLabel').textContent = `C${lecho.chrom.toFixed(2)}`;
-				document.querySelector('#hueLabel').textContent = `H${lecho.hue}°`;
-				// background-color: oklch(60% 0.4 240);
-			}
-
-			// function captureScroll(event){
-			// 	// Get the distance scrolled vertically
-			// 	var distanceScrolled = colorBox.scrollTop;
-
-			// 	// Log or use the distanceScrolled as needed
-			// 	console.log('Distance scrolled vertically:', distanceScrolled);
-			// };
-
-			colorBox.addEventListener('wheel', function(event) {
+			rootWidget.addEventListener('wheel', function(event) {
 				// The event.deltaY property represents the scroll distance
 				// var scrollDistance = event.deltaY;
 				// event.deltaY > 1 ? lecho.hue++ : lecho.hue--;
@@ -140,7 +169,7 @@
 				updateColorBox();
 
 				// Coordinates relative to the div
-				const div = document.querySelector('.colorBox');
+				const div = document.querySelector('.widget');
 				const divRect = div.getBoundingClientRect();
 				const relativeX = event.clientX - divRect.left;
 				const relativeY = event.clientY - divRect.top;
@@ -179,16 +208,57 @@
 				var bayer = rootWidget.style.filter;
 				flagMonochrome = !flagMonochrome;
 				rootWidget.style.filter=`grayscale(${+ flagMonochrome})`;
-				// bayer
-				// reasoning behind this (against a utility monochrome class pl.) is to keep the html widget cleaner I guess. And I usually think of classes as more static, architectural stuff.
-			}
-			function toggleMonochromeHalf(){
-				colorBox.style.filter = "grayscale(1)";
 			}
 
-			function toggleHead(){}
-			function toggleFlap(){}
-			function toggleHuePad(){}
+			function toggleHead(){
+				flagHead = !flagHead;
+			}
+			function toggleFlap(){
+				flagFlap = !flagFlap;
+			}
+
+
+			function updateColorBox() {
+				renderWidget();
+
+				function lightValueToText(){
+					if (lecho.light!=1) {
+						
+						return `L ${String(lecho.light.toFixed(2)).slice(-2)}%`
+					} else {
+						return "LIGHT";
+					}
+				}
+				document.querySelector('#lightLabel').textContent = lightValueToText();
+				document.querySelector('#chromaLabel').textContent = `C${lecho.chrom.toFixed(2)}`;
+				// this solution looks so good, I have to give credit for it @profitehlolz
+				document.querySelector('#hueLabel').textContent = `H${("000" + lecho.hue).slice(-3)}°`;
+			}
+
+			function renderWidget(){
+				colorBox.style.backgroundColor = `oklch(${lecho.light} ${lecho.chrom} ${lecho.hue})`;
+				if (flagHead){
+					rootWidget.style.backgroundColor = `oklch(${(1-lecho.light)} ${lecho.chrom} ${(360-lecho.hue)})`;
+					rootWidget.style.color = `oklch(${lecho.light} ${lecho.chrom} ${lecho.hue})`;
+				}
+				else {
+					rootWidget.style.backgroundColor = `oklch(${(lecho.light)} ${lecho.chrom} ${lecho.hue})`;
+					rootWidget.style.color = `oklch(${1-Math.round(lecho.light)} ${0} ${0})`;
+
+					// rootWidget.style.backgroundColor = `oklch(${(1)} ${0} ${(0)})`;
+					// rootWidget.style.color = `oklch(${0} ${0} ${0})`;
+				}
+				if (flagFlap){
+					if(!colorBox.classList.contains('flapped')){
+						colorBox.classList.add('flapped');
+					}
+				}
+				else {
+					if(colorBox.classList.contains('flapped')){
+						colorBox.classList.remove('flapped');
+					}
+				}
+			}
 		</script>
 	</main>
 
