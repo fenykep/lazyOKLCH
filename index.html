@@ -137,6 +137,7 @@
 			var flagFlap = true;
 			var flagHuePad = false;
 			var flagHelp = true;
+			var flagBlur = true;
 
 			var flagPortrait = false;
 			if(window.innerHeight > window.innerWidth){
@@ -184,9 +185,21 @@
 				document.querySelector('footer').style.display=flagHelp?'block':'none';
 			}
 
+			function toggleBlur() {
+				flagBlur = !flagBlur;
+				// if (!flagMonochrome) {
+				// 	rootWidget.style.filter=flagBlur?"blur(1px)":"none";
+				// } else {
+				// 	rootWidget.style.filter=flagBlur?"blur(1px) grayscale(1)":"grayscale(1)";
+				// }
+				rootWidget.style.filter=flagBlur?"blur(1px)":"none";
+				rootWidget.style.backgroundImage=flagBlur?"":"none";
+			}
+
 			function widgetClicked(){
 				toggleHead();
 				toggleFlap();
+				toggleBlur();
 				renderWidget();
 			};
 
