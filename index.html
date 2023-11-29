@@ -23,6 +23,9 @@
 				background-color: oklch(.27 .73 188);
 				
 				user-select: none;
+
+				border: 10px solid black;
+				box-sizing: border-box;
 			}
 			.cimkeTarolo{
 				display: flex;
@@ -78,11 +81,6 @@
 					touch-action: none;
 					-webkit-tap-highlight-color: rgb(0, 0, 0, 0);
 				}
-
-				.colorBox{
-					background-color: oklch(.73 .73 173);
-					width: 100%;
-				}
 			}
 		</style>
 		<!-- Ill want to find a sane amount of functions that could live here -->
@@ -105,9 +103,9 @@
 		</footer>
 		<script type="text/javascript">
 			var lecho = {
-				light: 0.73,
-				chrom:0.73,
-				hue:172,
+				light: 0.83,
+				chrom:0.12,
+				hue:Math.round(Math.random()*360),
 			};
 
 			var mouseIsDown = false;
@@ -122,6 +120,8 @@
 			if(window.innerHeight > window.innerWidth){
 			    flagPortrait = true;
 			}
+
+
 
 			var colorBox = document.querySelector('.colorBox');
 			var rootWidget = document.querySelector('.widget');
@@ -151,6 +151,7 @@
 			rootWidget.addEventListener("load", helpOff());
 
 			function helpOff(){
+				updateColorBox();
 				setTimeout(function() {
 					document.querySelector('footer').style.display='none';
 				}, 4000)
@@ -214,7 +215,7 @@
 
 				if (!mouseIsDown || event.pointerType=="touch") {
 					lecho.light = Math.round((relativeX / box.width) * 100)/100;
-					lecho.chrom = 1.00 - (Math.round((relativeY / box.height) * 100)/100);					
+					lecho.chrom = (0.37 - (Math.round((relativeY / box.height) * 100 * 0.37)/100));					
 				} else {
 					// dont change values if mouse is pressed
 					// might reverse
