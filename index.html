@@ -222,7 +222,11 @@
 					}
 				}
 				function chromaValueToText(){
-					return `C${lecho.chrom.toFixed(2)}`;
+					if (lecho.chrom!=0) {
+						return `C${lecho.chrom.toFixed(2)}`;
+					} else {
+						return "COALY";
+					}
 				}
 				document.querySelector('#lightLabel').textContent = lightValueToText();
 				document.querySelector('#chromaLabel').textContent = chromaValueToText();
