@@ -71,7 +71,7 @@
 					margin: 0;
 					width: 100%;
 					height: 100vh;
-					
+
 					touch-action: none;
 					-webkit-tap-highlight-color: rgb(0, 0, 0, 0);
 				}
@@ -84,7 +84,7 @@
 			}
 		</style>
 		<!-- Ill want to find a sane amount of functions that could live here -->
-		<div class="widget" onclick="widgetClicked()" onscroll="captureScroll(event)" onpointermove="captureMouse(event)">
+		<div class="widget" onclick="widgetClicked()" onscroll="captureScroll(event)" onpointermove="capturePointer(event)">
 			<div class="cimkeTarolo">
 				<h1 id="lightLabel">L 73%</h1>
 				<h1 id="chromaLabel">C0.73</h1>
@@ -190,7 +190,7 @@
 				event.preventDefault();
 			});
 
-			function captureMouse(event){
+			function capturePointer(event){
 				console.log(event);
 				// Global mouse coordinates
 				const globalX = event.pageX;
@@ -210,7 +210,7 @@
 					height: div.offsetHeight,
 				};
 
-				if (!mouseIsDown || flagPortrait) {
+				if (!mouseIsDown || event.pointerType=="touch") {
 					lecho.light = Math.round((relativeX / box.width) * 100)/100;
 					lecho.chrom = 1.00 - (Math.round((relativeY / box.height) * 100)/100);					
 				} else {
