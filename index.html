@@ -80,7 +80,7 @@
 			}
 		</style>
 		<!-- Ill want to find a sane amount of functions that could live here -->
-		<div class="widget" onclick="widgetClicked()" onscroll="captureScroll(event)" onmousemove="captureMouse(event)">
+		<div class="widget" onclick="widgetClicked()" onscroll="captureScroll(event)" onpointermove="captureMouse(event)">
 			<div class="cimkeTarolo">
 				<h1 id="lightLabel">L 73%</h1>
 				<h1 id="chromaLabel">C0.73</h1>
@@ -111,6 +111,11 @@
 			var flagFlap = true;
 			var flagHuePad = false;
 			var flagHelp = true;
+
+			var flagPortrait = false;
+			if(window.innerHeight > window.innerWidth){
+			    flagPortrait = true;
+			}
 
 			var colorBox = document.querySelector('.colorBox');
 			var rootWidget = document.querySelector('.widget');
@@ -200,7 +205,7 @@
 					height: div.offsetHeight,
 				};
 
-				if (!mouseIsDown) {
+				if (!mouseIsDown || flagPortrait) {
 					lecho.light = Math.round((relativeX / box.width) * 100)/100;
 					lecho.chrom = 1.00 - (Math.round((relativeY / box.height) * 100)/100);					
 				} else {
